@@ -2,9 +2,9 @@
 header('Content-Type: application/json; charset=utf-8');
 
 // Подключаем SxGeo.php класс
-// $sypex_path = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/../www/madmen-includ/SypexGeo/SxGeo.php'; // если файл лежит поодаль
-$sypex_path = 'SxGeo.php';
-require_once($sypex_path);
+$sypex_path = ''; // инициализация рабочей папки
+// $sypex_path = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/../www/madmen-includ/SypexGeo/'; // если папка находится поодаль
+require_once($sypex_path . 'SxGeo.php');
 
 // Разрешаем/запрещаем CORS
 $allow_cors = false;
@@ -39,7 +39,7 @@ $response = array();
 //     SXGEO_FILE   (работа с файлом базы, режим по умолчанию); 
 //     SXGEO_BATCH (пакетная обработка, увеличивает скорость при обработке множества IP за раз)
 //     SXGEO_MEMORY (кэширование БД в памяти, еще увеличивает скорость пакетной обработки, но требует больше памяти)
-$SxGeo = new SxGeo('SxGeoCity.dat');
+$SxGeo = new SxGeo($sypex_path . 'SxGeoCity.dat');
 
 // IP
 $remote_ip = $_SERVER['REMOTE_ADDR'];
