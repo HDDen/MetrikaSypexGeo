@@ -2,7 +2,9 @@
 header('Content-Type: application/json; charset=utf-8');
 
 // Подключаем SxGeo.php класс
-require_once("SxGeo.php");
+// $sypex_path = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/../www/madmen-includ/SypexGeo/SxGeo.php'; // если файл лежит поодаль
+$sypex_path = 'SxGeo.php';
+require_once($sypex_path);
 
 // Разрешаем/запрещаем CORS
 $allow_cors = false;
