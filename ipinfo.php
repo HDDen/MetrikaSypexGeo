@@ -8,8 +8,6 @@ require_once($sypex_path . 'SxGeo.php');
 
 // Разрешаем/запрещаем CORS
 $allow_cors = false;
-
-
 if ($allow_cors){
     // Allow from any origin
     if (isset($_SERVER['HTTP_ORIGIN'])) {
