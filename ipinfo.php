@@ -46,8 +46,18 @@ $remote_ip = $_SERVER['REMOTE_ADDR'];
 $client_ip = isset($_SERVER['HTTP_CLIENT_IP']) ? $_SERVER['HTTP_CLIENT_IP'] : '';
 $forwardedfor_ip = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
 
-// обработка прямого IP
+/**
+ * Обработка прямого IP
+ */
 $response['ip'] = $remote_ip;
+
+// подсеть
+$remote_ip_splitted = explode($remote_ip);
+$response['ip_subnet'] = $remote_ip_splitted[0] . '.' . $remote_ip_splitted[1] . '.' . $remote_ip_splitted[2] . '.xx';
+$response['ip_subnet_2'] = $remote_ip_splitted[0] . '.' . $remote_ip_splitted[1] . '.xx.xx';
+unset($remote_ip_splitted);
+
+// инфа об IP
 $remote_ip_info = $SxGeo->getCityFull($remote_ip);
 if (isset($remote_ip_info['city']) && isset($remote_ip_info['city']['name_en'])){
     $response['city'] = $remote_ip_info['city']['name_en'];
@@ -58,10 +68,20 @@ if (isset($remote_ip_info['region']) && isset($remote_ip_info['region']['name_en
 if (isset($remote_ip_info['country']) && isset($remote_ip_info['country']['name_en'])){
     $response['country'] = $remote_ip_info['country']['name_en'];
 }
+unset($remote_ip_info);
+unset($remote_ip);
 
-// обработка HTTP_CLIENT_IP
+/**
+ * Обработка HTTP_CLIENT_IP
+ */
 if ($client_ip){
     $response['client_ip'] = $client_ip;
+
+    $client_ip_splitted = explode($client_ip);
+    $response['client_ip_subnet'] = $client_ip_splitted[0] . '.' . $client_ip_splitted[1] . '.' . $client_ip_splitted[2] . '.xx';
+    $response['client_ip_subnet_2'] = $client_ip_splitted[0] . '.' . $client_ip_splitted[1] . '.xx.xx';
+    unset($client_ip_splitted);
+
     $client_ip_info = $SxGeo->getCityFull($client_ip);
     if (isset($client_ip_info['city']) && isset($client_ip_info['city']['name_en'])){
         $response['client_ip_city'] = $client_ip_info['city']['name_en'];
@@ -72,11 +92,21 @@ if ($client_ip){
     if (isset($client_ip_info['country']) && isset($client_ip_info['country']['name_en'])){
         $response['client_ip_country'] = $client_ip_info['country']['name_en'];
     }
+    unset($client_ip_info);
+    unset($client_ip);
 }
 
-// обработка HTTP_X_FORWARDED_FOR
+/**
+ * Обработка HTTP_X_FORWARDED_FOR
+ */
 if ($forwardedfor_ip){
     $response['forwardedfor_ip'] = $forwardedfor_ip;
+
+    $forwardedfor_ip_splitted = explode($forwardedfor_ip);
+    $response['forwardedfor_ip_subnet'] = $forwardedfor_ip_splitted[0] . '.' . $forwardedfor_ip_splitted[1] . '.' . $forwardedfor_ip_splitted[2] . '.xx';
+    $response['forwardedfor_ip_subnet_2'] = $forwardedfor_ip_splitted[0] . '.' . $forwardedfor_ip_splitted[1] . '.xx.xx';
+    unset($forwardedfor_ip_splitted);
+
     $forwardedfor_ip_info = $SxGeo->getCityFull($forwardedfor_ip);
     if (isset($forwardedfor_ip_info['city']) && isset($forwardedfor_ip_info['city']['name_en'])){
         $response['forwardedfor_ip_city'] = $forwardedfor_ip_info['city']['name_en'];
@@ -87,7 +117,11 @@ if ($forwardedfor_ip){
     if (isset($forwardedfor_ip_info['country']) && isset($forwardedfor_ip_info['country']['name_en'])){
         $response['forwardedfor_ip_country'] = $forwardedfor_ip_info['country']['name_en'];
     }
+    unset($forwardedfor_ip_info);
+    unset($forwardedfor_ip);
 }
 
-// отдаём ответ
+/**
+ * Отдаём ответ
+ */
 echo json_encode($response);
