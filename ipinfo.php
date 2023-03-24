@@ -131,7 +131,7 @@ if ($ipgeolocationIo_token){
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
-    CURLOPT_URL => 'https://api.ipgeolocation.io/ipgeo?apiKey='.$ipgeolocationIo_token.'&ip='.$remote_ip,
+    CURLOPT_URL => 'https://api.ipgeolocation.io/ipgeo?apiKey='.$ipgeolocationIo_token.'&ip='.$_SERVER['REMOTE_ADDR'],
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => '',
     CURLOPT_MAXREDIRS => 10,
