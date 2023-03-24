@@ -15,6 +15,8 @@ RewriteEngine On
 RewriteBase /
 RewriteCond %{REMOTE_ADDR} ^([0-9]{1,3})\.
 RewriteCond %{DOCUMENT_ROOT}/madmen-includ/MetrikaSypexGeo/firewall/%1/%{REMOTE_ADDR} -f
+# RewriteCond %{REMOTE_ADDR} ^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3}) # блок по подсети 1.2.3.*
+# RewriteCond %{DOCUMENT_ROOT}/madmen-includ/MetrikaSypexGeo/firewall/%1/%1.%2.%3.([0-9]{1,3}) -f # ^ продолжение
 RewriteRule . - [F]
  */
 function check_block_by_isp($isp, $workdir = ''){
