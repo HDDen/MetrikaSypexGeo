@@ -18,6 +18,7 @@ $ipgeolocationIo_token = ''; // Пробуем получить провайде
 $allow_cors = false; // Разрешаем/запрещаем CORS
 $block_by_isp = true; // Блокировки по isp. Нужно добавить запись из block_by_isp.php в .htaccess корня сайта!
 $pass_blockCheck_result = false; // false / string. Передавать в Метрику параметр, показывающий, попал ли ip в блэклист.
+$log_before_send = true; // Записывать отправляемые параметры в лог
 
 /**
  * Рабочая зона
@@ -177,6 +178,21 @@ if ($ipgeolocationIo_token){
             }
         }
     }
+}
+
+/**
+ * Пишем в лог
+ */
+if ($log_before_send){
+    $str = ';';
+    foreach ($response as $key => $value){
+        $str .= $value . ';';
+    }
+    $logdata = $str;
+    $logfile = 'log.txt';
+    date_default_timezone_set( 'Europe/Moscow' );
+    $date = date('d/m/Y H:i:s', time());
+    file_put_contents($logfile, $date.': '.$logdata.PHP_EOL, FILE_APPEND | LOCK_EX);
 }
 
 /**
