@@ -6,11 +6,21 @@ $sypex_path = ''; // инициализация рабочей папки
 // $sypex_path = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/../www/madmen-includ/MetrikaSypexGeo/'; // если папка находится поодаль
 require_once($sypex_path . 'SxGeo.php');
 
-// Пробуем получить провайдера (ipgeolocation.io, 30k запросов в месяц)
-$ipgeolocationIo_token = '';
+/**
+ * Доп. модули
+ */
+include_once($sypex_path . 'block_by_isp.php');
 
-// Разрешаем/запрещаем CORS
-$allow_cors = false;
+/**
+ * Опции
+ */
+$ipgeolocationIo_token = ''; // Пробуем получить провайдера (ipgeolocation.io, 30k запросов в месяц)
+$allow_cors = false; // Разрешаем/запрещаем CORS
+$block_by_isp = true; // Блокировки по isp. Нужно добавить запись из block_by_isp.php в .htaccess корня сайта!
+
+/**
+ * Рабочая зона
+ */
 if ($allow_cors){
     // Allow from any origin
     if (isset($_SERVER['HTTP_ORIGIN'])) {
@@ -154,6 +164,11 @@ if ($ipgeolocationIo_token){
     }
     if (isset($ipgeolocationIo_response['asn'])){
         $response['ip_asn'] = $ipgeolocationIo_response['asn'];
+    }
+
+    // блокировка по isp
+    if ($block_by_isp && function_exists('check_block_by_isp') && isset($ipgeolocationIo_response['isp']) && $ipgeolocationIo_response['isp']){
+        check_block_by_isp($ipgeolocationIo_response['isp'], $sypex_path);
     }
 }
 
