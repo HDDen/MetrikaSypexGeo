@@ -17,6 +17,7 @@ include_once($sypex_path . 'block_by_isp.php');
 $ipgeolocationIo_token = ''; // Пробуем получить провайдера (ipgeolocation.io, 30k запросов в месяц)
 $allow_cors = false; // Разрешаем/запрещаем CORS
 $block_by_isp = true; // Блокировки по isp. Нужно добавить запись из block_by_isp.php в .htaccess корня сайта!
+$pass_blockCheck_result = false; // false / string. Передавать в Метрику параметр, показывающий, попал ли ip в блэклист.
 
 /**
  * Рабочая зона
@@ -168,7 +169,13 @@ if ($ipgeolocationIo_token){
 
     // блокировка по isp
     if ($block_by_isp && function_exists('check_block_by_isp') && isset($ipgeolocationIo_response['isp']) && $ipgeolocationIo_response['isp']){
-        check_block_by_isp($ipgeolocationIo_response['isp'], $sypex_path);
+        $block_by_isp_result = check_block_by_isp($ipgeolocationIo_response['isp'], $sypex_path);
+
+        if ($pass_blockCheck_result){
+            if ($block_by_isp_result){
+                $response[$pass_blockCheck_result] = 'yes';
+            }
+        }
     }
 }
 
