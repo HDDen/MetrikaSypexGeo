@@ -14,7 +14,7 @@ if (!function_exists('mkpath')){
 RewriteEngine On
 RewriteBase /
 RewriteCond %{REMOTE_ADDR} ^([0-9]{1,3})\.
-RewriteCond /madmen_includ/MetrikaSypexGeo/firewall/%1/%{REMOTE_ADDR} -f
+RewriteCond %{DOCUMENT_ROOT}/madmen-includ/MetrikaSypexGeo/firewall/%1/%{REMOTE_ADDR} -f
 RewriteRule . - [F]
  */
 function check_block_by_isp($isp, $workdir = ''){
