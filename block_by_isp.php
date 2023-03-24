@@ -38,10 +38,15 @@ function check_block_by_isp($isp, $workdir = ''){
 
     // form path
     $ip_blocks = explode('.', $_SERVER['REMOTE_ADDR']);
-    $filepath = $workdir . '/firewall/' . $ip_blocks[0] . '/' . $_SERVER['REMOTE_ADDR'];
+
+    $blockfile_dir = $workdir . '/firewall/' . $ip_blocks[0] . '/';
+    $blockfile = $_SERVER['REMOTE_ADDR'];
 
     // create file
-    mkpath($filepath);
+    if (!file_exists($blockfile_dir . $blockfile)){
+        mkpath($blockfile_dir);
+        file_put_contents($blockfile_dir . $blockfile, '');
+    }
 
     return true;
 }
