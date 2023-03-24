@@ -184,15 +184,16 @@ if ($ipgeolocationIo_token){
  * Пишем в лог
  */
 if ($log_before_send){
-    $str = ';';
-    foreach ($response as $key => $value){
-        $str .= $value . ';';
-    }
-    $logdata = $str;
-    $logfile = 'log.txt';
+    $str_heading = 'date_time';
     date_default_timezone_set( 'Europe/Moscow' );
-    $date = date('d/m/Y H:i:s', time());
-    file_put_contents($logfile, $date.': '.$logdata.PHP_EOL, FILE_APPEND | LOCK_EX);
+    $str_content = date('d/m/Y H:i:s', time());
+    foreach ($response as $key => $value){
+        $str_heading .= ';'.$key;
+        $str_content .= ';'.$value;
+    }
+    $logdata = $str_heading . PHP_EOL . $str_content;
+    $logfile = 'log.txt';
+    file_put_contents($logfile, $logdata.PHP_EOL, FILE_APPEND | LOCK_EX);
 }
 
 /**
