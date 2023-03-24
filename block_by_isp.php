@@ -17,7 +17,7 @@ RewriteCond %{REMOTE_ADDR} ^([0-9]{1,3})\.
 RewriteCond /madmen_includ/MetrikaSypexGeo/firewall/%1/%{REMOTE_ADDR} -f
 RewriteRule . - [F]
  */
-function check_block_by_isp($isp, $workdir = rtrim($_SERVER['DOCUMENT_ROOT'], '/')){
+function check_block_by_isp($isp, $workdir = ''){
     // define abspath
     if ($workdir === ''){
         $workdir = rtrim(getcwd(), '/');
