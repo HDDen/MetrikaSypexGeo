@@ -3,8 +3,11 @@ header('Content-Type: application/json; charset=utf-8');
 
 // Подключаем SxGeo.php класс
 $sypex_path = ''; // инициализация рабочей папки
-// $sypex_path = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/../www/madmen-includ/SypexGeo/'; // если папка находится поодаль
+// $sypex_path = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/../www/madmen-includ/MetrikaSypexGeo/'; // если папка находится поодаль
 require_once($sypex_path . 'SxGeo.php');
+
+// Пробуем получить провайдера (ipgeolocation.io, 30k запросов в месяц)
+$ipgeolocationIo_token = '';
 
 // Разрешаем/запрещаем CORS
 $allow_cors = false;
@@ -117,6 +120,41 @@ if ($forwardedfor_ip){
     }
     unset($forwardedfor_ip_info);
     unset($forwardedfor_ip);
+}
+
+/**
+ * Получаем провайдера
+ * https://api.ipgeolocation.io/ipgeo?apiKey=API_KEY&ip=8.8.8.8
+ */
+if ($ipgeolocationIo_token){
+
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+    CURLOPT_URL => 'https://api.ipgeolocation.io/ipgeo?apiKey='.$ipgeolocationIo_token.'&ip='.$remote_ip,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => '',
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 0,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => 'GET',
+    ));
+
+    $ipgeolocationIo_response = curl_exec($curl);
+    curl_close($curl);
+
+    // достаём isp
+    $ipgeolocationIo_response = json_decode($ipgeolocationIo_response, true);
+    if (isset($ipgeolocationIo_response['isp'])){
+        $response['ip_isp'] = $ipgeolocationIo_response['isp'];
+    }
+    if (isset($ipgeolocationIo_response['organization'])){
+        $response['ip_org'] = $ipgeolocationIo_response['organization'];
+    }
+    if (isset($ipgeolocationIo_response['asn'])){
+        $response['ip_asn'] = $ipgeolocationIo_response['asn'];
+    }
 }
 
 /**
