@@ -18,7 +18,7 @@ RewriteCond %{DOCUMENT_ROOT}/madmen-includ/MetrikaSypexGeo/firewall/%1/%{REMOTE_
 RewriteRule . - [F]
 ## блок по подсети 1.2.3.*
 # RewriteCond %{REMOTE_ADDR} ^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})
-# RewriteCond %{DOCUMENT_ROOT}/madmen-includ/MetrikaSypexGeo/firewall/%1/%1.%2.%3.([0-9]{1,3}) -f
+# RewriteCond %{DOCUMENT_ROOT}/madmen-includ/MetrikaSypexGeo/firewall/%1/%1\.%2/%1\.%2\.%3 -d
 # RewriteRule . - [F]
 ## блок конкретных диапазонов вручную
 # RewriteCond %{REMOTE_ADDR} ^1\.2\.3\. [OR]
@@ -47,7 +47,7 @@ function check_block_by_isp($isp, $workdir = ''){
     // form path
     $ip_blocks = explode('.', $_SERVER['REMOTE_ADDR']);
 
-    $blockfile_dir = $workdir . '/firewall/' . $ip_blocks[0] . '/';
+    $blockfile_dir = $workdir . '/firewall/' . $ip_blocks[0] . '/' . $ip_blocks[0].'.'.$ip_blocks[1] . '/' . $ip_blocks[0].'.'.$ip_blocks[1].'.'.$ip_blocks[2] . '/';
     $blockfile = $_SERVER['REMOTE_ADDR'];
 
     // create file
