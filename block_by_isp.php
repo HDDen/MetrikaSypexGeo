@@ -16,7 +16,11 @@ RewriteBase /
 RewriteCond %{REMOTE_ADDR} ^([0-9]{1,3})\.
 RewriteCond %{DOCUMENT_ROOT}/madmen-includ/MetrikaSypexGeo/firewall/%1/%{REMOTE_ADDR} -f
 RewriteRule . - [F]
-## блок по подсети 1.2.3.*
+## блок по подсети 1.2.3.* - вариант на файлах (активен)
+# RewriteCond %{REMOTE_ADDR} ^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})
+# RewriteCond %{DOCUMENT_ROOT}/madmen-includ/MetrikaSypexGeo/firewall/%1/%1\.%2\.%3 -f
+# RewriteRule . - [F]
+## блок по подсети 1.2.3.* - вариант на папках (не активен)
 # RewriteCond %{REMOTE_ADDR} ^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})
 # RewriteCond %{DOCUMENT_ROOT}/madmen-includ/MetrikaSypexGeo/firewall/%1/%1\.%2/%1\.%2\.%3 -d
 # RewriteRule . - [F]
@@ -47,14 +51,30 @@ function check_block_by_isp($isp, $workdir = ''){
     // form path
     $ip_blocks = explode('.', $_SERVER['REMOTE_ADDR']);
 
-    $blockfile_dir = $workdir . '/firewall/' . $ip_blocks[0] . '/' . $ip_blocks[0].'.'.$ip_blocks[1] . '/' . $ip_blocks[0].'.'.$ip_blocks[1].'.'.$ip_blocks[2] . '/';
+    $blockfile_dir = $workdir . '/firewall/' . $ip_blocks[0] . '/';
     $blockfile = $_SERVER['REMOTE_ADDR'];
+
+    // variant based on folder structure. deprecated
+    // $blockfile_dir = $workdir . '/firewall/' . $ip_blocks[0] . '/' . $ip_blocks[0].'.'.$ip_blocks[1] . '/' . $ip_blocks[0].'.'.$ip_blocks[1].'.'.$ip_blocks[2] . '/';
+    // $blockfile = $_SERVER['REMOTE_ADDR'];
 
     // create file
     if (!file_exists($blockfile_dir . $blockfile)){
         mkpath($blockfile_dir);
         file_put_contents($blockfile_dir . $blockfile, '');
     }
+
+    // also create for subnets
+    $blockfile = $ip_blocks[0].'.'.$ip_blocks[1];
+    if (!file_exists($blockfile_dir . $blockfile)){
+        file_put_contents($blockfile_dir . $blockfile, '');
+    }
+
+    $blockfile = $ip_blocks[0].'.'.$ip_blocks[1].'.'.$ip_blocks[2];
+    if (!file_exists($blockfile_dir . $blockfile)){
+        file_put_contents($blockfile_dir . $blockfile, '');
+    }
+    // created full array, end
 
     return true;
 }
