@@ -1,6 +1,7 @@
 (function(){
     var metrika_id = false; // false для автопоиска или конкретный счётчик
     var search_isp = true; // false если нужна только локация, без провайдера. Либо если проверяем провайдера на бэке
+    var storeInWindow = false; // false или имя ключа, по которому будет сохранен в window итоговый объект с параметрами
     
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '/madmen-includ/MetrikaSypexGeo/ipinfo.php');
@@ -38,7 +39,6 @@
                 }
             } catch(err){}
 
-            
             if (resp){
                 
                 if (search_isp){
@@ -67,17 +67,26 @@
                     console.log('params', resp);
                     ym(metrika_id, 'params', resp);
                 }
-                
             } else {
-                console.log('params', resp);
-                console.log("params wasn't sent");
+                console.log('params', resp, "params wasn't sent");
+            }
+
+            // сохраним в Window
+            if (storeInWindow){
+                window["storeInWindow"] = resp;
             }
         });
     }
     xhr.onerror = function(){
         waitForYm(metrika_id, function(counter, metrika_id){
             //console.log('madmen_ipinfo_blocked');
-            ym(metrika_id, 'params', {madmen_ipinfo_blocked: 'yes'});
+            var resp = {madmen_ipinfo_blocked: 'yes'};
+            ym(metrika_id, 'params', resp);
+
+            // сохраним в Window
+            if (storeInWindow){
+                window["storeInWindow"] = resp;
+            }
         });
     };
     xhr.send();
@@ -100,4 +109,4 @@
 }());
 
 // minified with https://www.digitalocean.com/community/tools/minify
-(function(){var metrika_id=false;var search_isp=true;var xhr=new XMLHttpRequest;xhr.open("GET","/madmen-includ/MetrikaSypexGeo/ipinfo.php");xhr.setRequestHeader("Content-Type","application/json; charset=UTF-8");xhr.responseType="json";xhr.onload=function(){waitForYm(metrika_id,(function(counter,metrika_id){var resp=xhr.response;try{var l=window.localStorage;if(l){var hist=l.getItem("madm_iphist");if(hist){hist=JSON.parse(hist);if(!(hist instanceof Array)){hist=[hist]}}else{hist=[]}if(hist.indexOf(resp.ip)===-1){hist.push(resp.ip)}resp["ip_history"]=hist;l.setItem("madm_iphist",JSON.stringify(hist))}}catch(err){}if(resp){if(search_isp){var xhr_isp=new XMLHttpRequest;xhr_isp.open("GET","https://ipinfo.io/json");xhr_isp.setRequestHeader("Content-Type","application/json; charset=UTF-8");xhr_isp.responseType="json";xhr_isp.onload=function(){var resp_ipapi=xhr_isp.response;resp.ip_org=resp_ipapi.org?resp_ipapi.org:"";console.log("params",resp);ym(metrika_id,"params",resp)};xhr_isp.onerror=function(){console.log("params",resp);ym(metrika_id,"params",resp)};xhr_isp.send()}else{console.log("params",resp);ym(metrika_id,"params",resp)}}else{console.log("params",resp);console.log("params wasn't sent")}}))};xhr.onerror=function(){waitForYm(metrika_id,(function(counter,metrika_id){ym(metrika_id,"params",{madmen_ipinfo_blocked:"yes"})}))};xhr.send();function waitForYm(ymCounterNum,callback,interval){if(!callback)return;if(!ymCounterNum){var metrikaObj=window.Ya&&(window.Ya.Metrika||window.Ya.Metrika2)||null;ymCounterNum=metrikaObj&&metrikaObj.counters&&(metrikaObj.counters()||[0])[0].id||0}var ymCounterObj=window["yaCounter"+ymCounterNum]||null;if(ymCounterObj)return callback(ymCounterObj,ymCounterNum),undefined;setTimeout((function(){waitForYm(ymCounterNum,callback,interval)}),interval||250)}})();
+(function(){var metrika_id=false;var search_isp=true;var storeInWindow=false;var xhr=new XMLHttpRequest;xhr.open("GET","/madmen-includ/MetrikaSypexGeo/ipinfo.php");xhr.setRequestHeader("Content-Type","application/json; charset=UTF-8");xhr.responseType="json";xhr.onload=function(){waitForYm(metrika_id,(function(counter,metrika_id){var resp=xhr.response;try{var l=window.localStorage;if(l){var hist=l.getItem("madm_iphist");if(hist){hist=JSON.parse(hist);if(!(hist instanceof Array)){hist=[hist]}}else{hist=[]}if(hist.indexOf(resp.ip)===-1){hist.push(resp.ip)}resp["ip_history"]=hist;l.setItem("madm_iphist",JSON.stringify(hist))}}catch(err){}if(resp){if(search_isp){var xhr_isp=new XMLHttpRequest;xhr_isp.open("GET","https://ipinfo.io/json");xhr_isp.setRequestHeader("Content-Type","application/json; charset=UTF-8");xhr_isp.responseType="json";xhr_isp.onload=function(){var resp_ipapi=xhr_isp.response;resp.ip_org=resp_ipapi.org?resp_ipapi.org:"";console.log("params",resp);ym(metrika_id,"params",resp)};xhr_isp.onerror=function(){console.log("params",resp);ym(metrika_id,"params",resp)};xhr_isp.send()}else{console.log("params",resp);ym(metrika_id,"params",resp)}}else{console.log("params",resp,"params wasn't sent")}if(storeInWindow){window["storeInWindow"]=resp}}))};xhr.onerror=function(){waitForYm(metrika_id,(function(counter,metrika_id){var resp={madmen_ipinfo_blocked:"yes"};ym(metrika_id,"params",resp);if(storeInWindow){window["storeInWindow"]=resp}}))};xhr.send();function waitForYm(ymCounterNum,callback,interval){if(!callback)return;if(!ymCounterNum){var metrikaObj=window.Ya&&(window.Ya.Metrika||window.Ya.Metrika2)||null;ymCounterNum=metrikaObj&&metrikaObj.counters&&(metrikaObj.counters()||[0])[0].id||0}var ymCounterObj=window["yaCounter"+ymCounterNum]||null;if(ymCounterObj)return callback(ymCounterObj,ymCounterNum),undefined;setTimeout((function(){waitForYm(ymCounterNum,callback,interval)}),interval||250)}})();
