@@ -29,6 +29,11 @@ RewriteRule . - [F]
 # RewriteCond %{REMOTE_ADDR} ^1\.2\.
 # RewriteRule . - [F]
  */
+/**
+ * Принимает вычисленное имя провайдера, 
+ * если он отсутствует в блоклисте - вернёт false,
+ * если есть - создаст метку для блокировки и вернёт true
+ */
 function check_block_by_isp($isp, $workdir = ''){
     // define abspath
     if ($workdir === ''){

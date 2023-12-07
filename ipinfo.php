@@ -14,11 +14,17 @@ include_once($sypex_path . 'block_by_isp.php');
 /**
  * Опции
  */
-$ipgeolocationIo_token = ''; // Пробуем получить провайдера (ipgeolocation.io, 30k запросов в месяц)
+$ipgeolocationIo_tokens = [
+    'aaaaaabbbbbbbccccccc',
+]; // Пробуем получить провайдера (ipgeolocation.io, 30k запросов в месяц / 1k в день). Можно прописать ключи от разных аккаунтов
 $allow_cors = false; // Разрешаем/запрещаем CORS
-$block_by_isp = true; // Блокировки по isp. Нужно добавить запись из block_by_isp.php в .htaccess корня сайта!
+$detect_isp = false; // Пытаться просто отыскать имя провайдера, без блокировки, для передачи на фронт и в метрику? false если нет или если isp ищем на самом фронте
+$block_by_isp = false; // Блокировки по isp. Нужно добавить запись из block_by_isp.php в .htaccess корня сайта!
 $pass_blockCheck_result = false; // false / string. Передавать в Метрику параметр, показывающий, попал ли ip в блэклист.
 $log_before_send = true; // Записывать отправляемые параметры в лог
+$optimize_log = true; // Записать заголовок лога один раз и больше не дописывать. Лучше всего работает, когда известен порядок ячеек и он неизменен; в этом случае можно вручную один раз прописать в логе заголовки и не трогать
+$log_static_header = 'date_time;ip;ip_subnet;ip_subnet_2;city;region;country;forwardedfor_ip;forwardedfor_ip_subnet;forwardedfor_ip_subnet_2;forwardedfor_ip_city;forwardedfor_ip_region;forwardedfor_ip_country;ip_isp;ip_org;blacklisted';
+$logfile = 'log.txt';
 
 /**
  * Рабочая зона
@@ -138,8 +144,16 @@ if ($forwardedfor_ip){
  * Получаем провайдера
  * https://api.ipgeolocation.io/ipgeo?apiKey=API_KEY&ip=8.8.8.8
  */
-if ($ipgeolocationIo_token){
+if (!empty($ipgeolocationIo_tokens) && ($detect_isp || $block_by_isp)){
 
+    // получаем случайный ключ
+    $ipgeolocationIo_token_index = rand(0, count($ipgeolocationIo_tokens)-1);
+    $ipgeolocationIo_token = $ipgeolocationIo_tokens[$ipgeolocationIo_token_index];
+    unset($ipgeolocationIo_tokens[$ipgeolocationIo_token_index]);
+
+    // TODO если токены закончились - выбрать другой ключ
+
+    // делаем запрос
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
@@ -183,16 +197,45 @@ if ($ipgeolocationIo_token){
 /**
  * Пишем в лог
  */
-if ($log_before_send){
-    $str_heading = 'date_time';
+if ($log_before_send && is_writable($logfile)){
+    $log_size = filesize($logfile);
+
+    // проверяем, заполнять ли заголовок лога. Если оптимизируем лог, и размер лога 0, пропишем первую ячейку
+    // если оптимизируем лог
+    if ($optimize_log){
+        
+        // если лог не пустой
+        if ($log_size) {
+            $str_heading = false;
+        } else {
+            // лог пуст
+            // решаем, вставить в заголовок статичное начало или будем дополнять
+            if ($log_static_header){
+                $str_heading = $log_static_header;
+            } else {
+                $str_heading = 'date_time';
+            }
+        }
+
+    } else {
+        $str_heading = 'date_time';
+    }
+
+    // фиксируем дату
     date_default_timezone_set( 'Europe/Moscow' );
     $str_content = date('d/m/Y H:i:s', time());
+    
+    // перебор ответа с фиксацией в лог
     foreach ($response as $key => $value){
-        $str_heading .= ';'.$key;
+        // если заголовок лога не пуст, и не равен статическому заголовку, допишем в него название перебираемой ячейки
+        if ($str_heading && ($str_heading !== $log_static_header)){
+            $str_heading .= ';'.$key;
+        }
+
         $str_content .= ';'.$value;
     }
-    $logdata = $str_heading . PHP_EOL . $str_content;
-    $logfile = 'log.txt';
+
+    $logdata = ($str_heading ? $str_heading.PHP_EOL : '') . $str_content;
     file_put_contents($logfile, $logdata.PHP_EOL, FILE_APPEND | LOCK_EX);
 }
 
