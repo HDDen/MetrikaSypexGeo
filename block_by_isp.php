@@ -35,6 +35,14 @@ RewriteRule . - [F]
  * если есть - создаст метку для блокировки и вернёт true
  */
 function check_block_by_isp($isp, $workdir = ''){
+    $debug = false;
+    $logfile = 'log__check_block_by_isp.txt';
+    date_default_timezone_set( 'Europe/Moscow' );
+
+    $debug ? file_put_contents($logfile, 
+    date('d/m/Y H:i:s', time()) . ': Зашли, $isp = '.$isp.', ip = '.$_SERVER['REMOTE_ADDR']
+    .PHP_EOL, FILE_APPEND | LOCK_EX) : '';
+
     // define abspath
     if ($workdir === ''){
         $workdir = rtrim(getcwd(), '/');
@@ -45,13 +53,29 @@ function check_block_by_isp($isp, $workdir = ''){
     $rules = '';
     if (file_exists($workdir_module . '/block_by_isp.txt')){
         $rules = file_get_contents($workdir_module . '/block_by_isp.txt');
-        $rules = explode(PHP_EOL, $rules);
+        $rules = preg_split('/\r\n|\r|\n/', $rules);
+
+        $debug ? file_put_contents($logfile, 
+        'Правила:'.PHP_EOL.print_r($rules, true)
+        .PHP_EOL, FILE_APPEND | LOCK_EX) : '';
     } else {
+
+        $debug ? file_put_contents($logfile, 
+        $workdir_module . '/block_by_isp.txt не существует, уходим'
+        .PHP_EOL, FILE_APPEND | LOCK_EX) : '';
+
         return false;
     }
 
     // check our isp
-    if (!in_array($isp, $rules)) return false;
+    if (!in_array($isp, $rules)){
+        
+        $debug ? file_put_contents($logfile, 
+        $isp. ' не в списке запрещённых, уходим'
+        .PHP_EOL, FILE_APPEND | LOCK_EX) : '';
+
+        return false;
+    }
 
     // form path
     $ip_blocks = explode('.', $_SERVER['REMOTE_ADDR']);
@@ -66,7 +90,11 @@ function check_block_by_isp($isp, $workdir = ''){
     // create file
     if (!file_exists($blockfile_dir . $blockfile)){
         mkpath($blockfile_dir);
-        file_put_contents($blockfile_dir . $blockfile, '');
+        $creating_blockfile_result = file_put_contents($blockfile_dir . $blockfile, '');
+
+        $debug ? file_put_contents($logfile, 
+        'Результат создания блокировочного файла '.$blockfile_dir . $blockfile . ' = '.$creating_blockfile_result
+        .PHP_EOL, FILE_APPEND | LOCK_EX) : '';
     }
 
     // also create for subnets
@@ -80,6 +108,10 @@ function check_block_by_isp($isp, $workdir = ''){
         file_put_contents($blockfile_dir . $blockfile, '');
     }
     // created full array, end
+
+    $debug ? file_put_contents($logfile, 
+    'Отработали, уходим'
+    .PHP_EOL, FILE_APPEND | LOCK_EX) : '';
 
     return true;
 }
