@@ -40,7 +40,7 @@ function check_block_by_isp($isp, $workdir = ''){
     date_default_timezone_set( 'Europe/Moscow' );
 
     $debug ? file_put_contents($logfile, 
-    date('d/m/Y H:i:s', time()) . ': Зашли, $isp = '.$isp.', ip = '.$_SERVER['REMOTE_ADDR']
+    date(PHP_EOL.'d/m/Y H:i:s', time()) . ': Зашли, $isp = '.$isp.', ip = '.$_SERVER['REMOTE_ADDR']
     .PHP_EOL, FILE_APPEND | LOCK_EX) : '';
 
     // define abspath
@@ -90,7 +90,7 @@ function check_block_by_isp($isp, $workdir = ''){
     // create file
     if (!file_exists($blockfile_dir . $blockfile)){
         mkpath($blockfile_dir);
-        $creating_blockfile_result = file_put_contents($blockfile_dir . $blockfile, '');
+        $creating_blockfile_result = file_put_contents($blockfile_dir . $blockfile, $isp);
 
         $debug ? file_put_contents($logfile, 
         'Результат создания блокировочного файла '.$blockfile_dir . $blockfile . ' = '.$creating_blockfile_result
@@ -100,12 +100,12 @@ function check_block_by_isp($isp, $workdir = ''){
     // also create for subnets
     $blockfile = $ip_blocks[0].'.'.$ip_blocks[1];
     if (!file_exists($blockfile_dir . $blockfile)){
-        file_put_contents($blockfile_dir . $blockfile, '');
+        file_put_contents($blockfile_dir . $blockfile, $isp);
     }
 
     $blockfile = $ip_blocks[0].'.'.$ip_blocks[1].'.'.$ip_blocks[2];
     if (!file_exists($blockfile_dir . $blockfile)){
-        file_put_contents($blockfile_dir . $blockfile, '');
+        file_put_contents($blockfile_dir . $blockfile, $isp);
     }
     // created full array, end
 
@@ -114,4 +114,26 @@ function check_block_by_isp($isp, $workdir = ''){
     .PHP_EOL, FILE_APPEND | LOCK_EX) : '';
 
     return true;
+}
+
+/**
+ * Прокси для проверки по организации
+ * В будущем - копия функции, только с проверкой по организации
+ */
+function check_block_by_org($isp, $workdir = ''){
+    $debug = true;
+    $logfile = 'log__check_block_by_isp.txt'; // так как это прокси, лог используем общий
+    date_default_timezone_set( 'Europe/Moscow' );
+
+    $debug ? file_put_contents($logfile, 
+    date(PHP_EOL.'d/m/Y H:i:s', time()) . ': check_block_by_org(): Зашли, $isp = '.$isp.', ip = '.$_SERVER['REMOTE_ADDR']
+    .PHP_EOL, FILE_APPEND | LOCK_EX) : '';
+
+    $result = check_block_by_isp($isp, $workdir);
+
+    $debug ? file_put_contents($logfile, 
+    'check_block_by_org(): Результат = '.$result.', уходим'
+    .PHP_EOL, FILE_APPEND | LOCK_EX) : '';
+
+    return $result;
 }

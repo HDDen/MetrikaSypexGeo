@@ -20,6 +20,7 @@ $ipgeolocationIo_tokens = [
 $allow_cors = false; // Разрешаем/запрещаем CORS
 $detect_isp = false; // Пытаться просто отыскать имя провайдера, без блокировки, для передачи на фронт и в метрику? false если нет или если isp ищем на самом фронте
 $block_by_isp = false; // Блокировки по isp. Нужно добавить запись из block_by_isp.php в .htaccess корня сайта!
+$block_by_org = true; // То же, но проверка по по организации. Бывает, что одна организация использует разные ISP
 $pass_blockCheck_result = false; // false / string. Передавать в Метрику параметр, показывающий, попал ли ip в блэклист.
 $log_before_send = true; // Записывать отправляемые параметры в лог
 $optimize_log = true; // Записать заголовок лога один раз и больше не дописывать. Лучше всего работает, когда известен порядок ячеек и он неизменен; в этом случае можно вручную один раз прописать в логе заголовки и не трогать
@@ -144,7 +145,7 @@ if ($forwardedfor_ip){
  * Получаем провайдера
  * https://api.ipgeolocation.io/ipgeo?apiKey=API_KEY&ip=8.8.8.8
  */
-if (!empty($ipgeolocationIo_tokens) && ($detect_isp || $block_by_isp)){
+if (!empty($ipgeolocationIo_tokens) && ($detect_isp || $block_by_isp || $block_by_org)){
 
     // получаем случайный ключ
     $ipgeolocationIo_token_index = rand(0, count($ipgeolocationIo_tokens)-1);
@@ -188,6 +189,17 @@ if (!empty($ipgeolocationIo_tokens) && ($detect_isp || $block_by_isp)){
 
         if ($pass_blockCheck_result){
             if ($block_by_isp_result){
+                $response[$pass_blockCheck_result] = 'yes';
+            }
+        }
+    }
+
+    // блокировка по организации
+    if ($block_by_org && function_exists('check_block_by_org') && isset($ipgeolocationIo_response['organization']) && $ipgeolocationIo_response['organization']){
+        $block_by_org_result = check_block_by_org($ipgeolocationIo_response['organization'], $sypex_path);
+
+        if ($pass_blockCheck_result){
+            if ($block_by_org_result){
                 $response[$pass_blockCheck_result] = 'yes';
             }
         }
