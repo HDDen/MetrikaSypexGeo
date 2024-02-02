@@ -62,7 +62,9 @@ $response = array();
 $SxGeo = new SxGeo($sypex_path . 'SxGeoCity.dat');
 
 // IP
+$headers = getallheaders();
 $remote_ip = $_SERVER['REMOTE_ADDR'];
+$cf_connecting_ip = isset($headeers['Cf-Connecting-Ip']) ? $headeers['Cf-Connecting-Ip'] : '';
 $client_ip = isset($_SERVER['HTTP_CLIENT_IP']) ? $_SERVER['HTTP_CLIENT_IP'] : '';
 $forwardedfor_ip = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
 
@@ -92,6 +94,33 @@ if (isset($remote_ip_info['country']) && isset($remote_ip_info['country']['name_
 }
 unset($remote_ip_info);
 unset($remote_ip);
+
+/**
+ * Обработка Cf-Connecting-Ip
+ */
+if ($cf_connecting_ip){
+    $response['cf_conn_ip'] = $cf_connecting_ip;
+
+    $cf_connecting_ip_splitted = explode('.', $cf_connecting_ip);
+    if (@$cf_connecting_ip_splitted[1] && $cf_connecting_ip_splitted[2]){
+        $response['client_ip_subnet'] = $cf_connecting_ip_splitted[0] . '.' . $cf_connecting_ip_splitted[1] . '.' . $cf_connecting_ip_splitted[2] . '.xx';
+        $response['client_ip_subnet_2'] = $cf_connecting_ip_splitted[0] . '.' . $cf_connecting_ip_splitted[1] . '.xx.xx';
+    }
+    unset($cf_connecting_ip_splitted);
+
+    $cf_connecting_ip_info = $SxGeo->getCityFull($cf_connecting_ip);
+    if (isset($cf_connecting_ip_info['city']) && isset($cf_connecting_ip_info['city']['name_en'])){
+        $response['client_ip_city'] = $cf_connecting_ip_info['city']['name_en'];
+    }
+    if (isset($cf_connecting_ip_info['region']) && isset($cf_connecting_ip_info['region']['name_en'])){
+        $response['client_ip_region'] = $cf_connecting_ip_info['region']['name_en'];
+    }
+    if (isset($cf_connecting_ip_info['country']) && isset($cf_connecting_ip_info['country']['name_en'])){
+        $response['client_ip_country'] = $cf_connecting_ip_info['country']['name_en'];
+    }
+    unset($cf_connecting_ip_info);
+    unset($cf_connecting_ip);
+}
 
 /**
  * Обработка HTTP_CLIENT_IP
@@ -126,7 +155,7 @@ if ($client_ip){
 if ($forwardedfor_ip){
     $response['forwardedfor_ip'] = $forwardedfor_ip;
 
-    $forwardedfor_ip_splitted = explode('.', $forwardedfor_ip);
+    $forwardedfor_ip_splitted = explode('.', (explode(',', $forwardedfor_ip)[0]));
     if (@$forwardedfor_ip_splitted[1] && $forwardedfor_ip_splitted[2]){
         $response['forwardedfor_ip_subnet'] = $forwardedfor_ip_splitted[0] . '.' . $forwardedfor_ip_splitted[1] . '.' . $forwardedfor_ip_splitted[2] . '.xx';
         $response['forwardedfor_ip_subnet_2'] = $forwardedfor_ip_splitted[0] . '.' . $forwardedfor_ip_splitted[1] . '.xx.xx';
