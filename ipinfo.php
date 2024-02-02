@@ -73,8 +73,10 @@ $response['ip'] = $remote_ip;
 
 // подсеть
 $remote_ip_splitted = explode('.', $remote_ip);
-$response['ip_subnet'] = $remote_ip_splitted[0] . '.' . $remote_ip_splitted[1] . '.' . $remote_ip_splitted[2] . '.xx';
-$response['ip_subnet_2'] = $remote_ip_splitted[0] . '.' . $remote_ip_splitted[1] . '.xx.xx';
+if (@$remote_ip_splitted[1] && @$remote_ip_splitted[2]){
+    $response['ip_subnet'] = $remote_ip_splitted[0] . '.' . $remote_ip_splitted[1] . '.' . $remote_ip_splitted[2] . '.xx';
+    $response['ip_subnet_2'] = $remote_ip_splitted[0] . '.' . $remote_ip_splitted[1] . '.xx.xx';
+}
 unset($remote_ip_splitted);
 
 // инфа об IP
@@ -98,8 +100,10 @@ if ($client_ip){
     $response['client_ip'] = $client_ip;
 
     $client_ip_splitted = explode('.', $client_ip);
-    $response['client_ip_subnet'] = $client_ip_splitted[0] . '.' . $client_ip_splitted[1] . '.' . $client_ip_splitted[2] . '.xx';
-    $response['client_ip_subnet_2'] = $client_ip_splitted[0] . '.' . $client_ip_splitted[1] . '.xx.xx';
+    if (@$client_ip_splitted[1] && $client_ip_splitted[2]){
+        $response['client_ip_subnet'] = $client_ip_splitted[0] . '.' . $client_ip_splitted[1] . '.' . $client_ip_splitted[2] . '.xx';
+        $response['client_ip_subnet_2'] = $client_ip_splitted[0] . '.' . $client_ip_splitted[1] . '.xx.xx';
+    }
     unset($client_ip_splitted);
 
     $client_ip_info = $SxGeo->getCityFull($client_ip);
@@ -123,8 +127,10 @@ if ($forwardedfor_ip){
     $response['forwardedfor_ip'] = $forwardedfor_ip;
 
     $forwardedfor_ip_splitted = explode('.', $forwardedfor_ip);
-    $response['forwardedfor_ip_subnet'] = $forwardedfor_ip_splitted[0] . '.' . $forwardedfor_ip_splitted[1] . '.' . $forwardedfor_ip_splitted[2] . '.xx';
-    $response['forwardedfor_ip_subnet_2'] = $forwardedfor_ip_splitted[0] . '.' . $forwardedfor_ip_splitted[1] . '.xx.xx';
+    if (@$forwardedfor_ip_splitted[1] && $forwardedfor_ip_splitted[2]){
+        $response['forwardedfor_ip_subnet'] = $forwardedfor_ip_splitted[0] . '.' . $forwardedfor_ip_splitted[1] . '.' . $forwardedfor_ip_splitted[2] . '.xx';
+        $response['forwardedfor_ip_subnet_2'] = $forwardedfor_ip_splitted[0] . '.' . $forwardedfor_ip_splitted[1] . '.xx.xx';
+    }
     unset($forwardedfor_ip_splitted);
 
     $forwardedfor_ip_info = $SxGeo->getCityFull($forwardedfor_ip);
