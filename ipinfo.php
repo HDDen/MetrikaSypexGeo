@@ -26,6 +26,7 @@ $log_before_send = true; // Записывать отправляемые пар
 $optimize_log = true; // Записать заголовок лога один раз и больше не дописывать. Лучше всего работает, когда известен порядок ячеек и он неизменен; в этом случае можно вручную один раз прописать в логе заголовки и не трогать
 $log_static_header = 'date_time;ip;ip_subnet;ip_subnet_2;city;region;country;forwardedfor_ip;forwardedfor_ip_subnet;forwardedfor_ip_subnet_2;forwardedfor_ip_city;forwardedfor_ip_region;forwardedfor_ip_country;ip_isp;ip_org;blacklisted';
 $logfile = 'log.txt';
+$log_headers = true;
 
 /**
  * Рабочая зона
@@ -64,9 +65,19 @@ $SxGeo = new SxGeo($sypex_path . 'SxGeoCity.dat');
 // IP
 $headers = getallheaders();
 $remote_ip = $_SERVER['REMOTE_ADDR'];
-$cf_connecting_ip = isset($headeers['Cf-Connecting-Ip']) ? $headeers['Cf-Connecting-Ip'] : '';
+$cf_connecting_ip = isset($headers['Cf-Connecting-Ip']) ? $headers['Cf-Connecting-Ip'] : '';
 $client_ip = isset($_SERVER['HTTP_CLIENT_IP']) ? $_SERVER['HTTP_CLIENT_IP'] : '';
 $forwardedfor_ip = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
+
+/**
+ * Запишем заголовки для дебага
+ */
+if ($log_headers){
+    $logdata = print_r($headers,true);
+    date_default_timezone_set( 'Europe/Moscow' );
+    $date = date('d/m/Y H:i:s', time());
+    file_put_contents('log__headers.txt', $date.': '.PHP_EOL.$remote_ip.PHP_EOL.$logdata.PHP_EOL, FILE_APPEND | LOCK_EX);
+}
 
 /**
  * Обработка прямого IP
@@ -103,20 +114,20 @@ if ($cf_connecting_ip){
 
     $cf_connecting_ip_splitted = explode('.', $cf_connecting_ip);
     if (@$cf_connecting_ip_splitted[1] && $cf_connecting_ip_splitted[2]){
-        $response['client_ip_subnet'] = $cf_connecting_ip_splitted[0] . '.' . $cf_connecting_ip_splitted[1] . '.' . $cf_connecting_ip_splitted[2] . '.xx';
-        $response['client_ip_subnet_2'] = $cf_connecting_ip_splitted[0] . '.' . $cf_connecting_ip_splitted[1] . '.xx.xx';
+        $response['cf_connecting_ip_subnet'] = $cf_connecting_ip_splitted[0] . '.' . $cf_connecting_ip_splitted[1] . '.' . $cf_connecting_ip_splitted[2] . '.xx';
+        $response['cf_connecting_ip_subnet_2'] = $cf_connecting_ip_splitted[0] . '.' . $cf_connecting_ip_splitted[1] . '.xx.xx';
     }
     unset($cf_connecting_ip_splitted);
 
     $cf_connecting_ip_info = $SxGeo->getCityFull($cf_connecting_ip);
     if (isset($cf_connecting_ip_info['city']) && isset($cf_connecting_ip_info['city']['name_en'])){
-        $response['client_ip_city'] = $cf_connecting_ip_info['city']['name_en'];
+        $response['cf_connecting_ip_city'] = $cf_connecting_ip_info['city']['name_en'];
     }
     if (isset($cf_connecting_ip_info['region']) && isset($cf_connecting_ip_info['region']['name_en'])){
-        $response['client_ip_region'] = $cf_connecting_ip_info['region']['name_en'];
+        $response['cf_connecting_ip_region'] = $cf_connecting_ip_info['region']['name_en'];
     }
     if (isset($cf_connecting_ip_info['country']) && isset($cf_connecting_ip_info['country']['name_en'])){
-        $response['client_ip_country'] = $cf_connecting_ip_info['country']['name_en'];
+        $response['cf_connecting_ip_country'] = $cf_connecting_ip_info['country']['name_en'];
     }
     unset($cf_connecting_ip_info);
     unset($cf_connecting_ip);
@@ -244,7 +255,7 @@ if (!empty($ipgeolocationIo_tokens) && ($detect_isp || $block_by_isp || $block_b
 /**
  * Пишем в лог
  */
-if ($log_before_send && is_writable($logfile)){
+if ($log_before_send){
     $log_size = filesize($logfile);
 
     // проверяем, заполнять ли заголовок лога. Если оптимизируем лог, и размер лога 0, пропишем первую ячейку
