@@ -1,9 +1,12 @@
 /**
  * Для принудительного запуска без ожидания DOMContentLoaded закомментировать строки:
+
 !function(){function n(){
 и
 }"loading"!=document.readyState?n():document.addEventListener("DOMContentLoaded",function(){n()})}();
+
  */
+
 !function(){function n(){
 (function(){
     var metrika_id = false; // false для автопоиска или конкретный счётчик
