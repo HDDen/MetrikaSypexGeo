@@ -3,7 +3,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 // Подключаем SxGeo.php класс
 $sypex_path = ''; // инициализация рабочей папки
-// $sypex_path = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/../www/madmen-includ/MetrikaSypexGeo/'; // если папка находится поодаль
+// $sypex_path = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/../www/hdden-includes/MetrikaSypexGeo/'; // если папка находится поодаль
 require_once($sypex_path . 'SxGeo.php');
 
 /**

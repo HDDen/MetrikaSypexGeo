@@ -14,15 +14,15 @@ if (!function_exists('mkpath')){
 RewriteEngine On
 RewriteBase /
 RewriteCond %{REMOTE_ADDR} ^([0-9]{1,3})\.
-RewriteCond %{DOCUMENT_ROOT}/madmen-includ/MetrikaSypexGeo/firewall/%1/%{REMOTE_ADDR} -f
+RewriteCond %{DOCUMENT_ROOT}/hdden-includes/MetrikaSypexGeo/firewall/%1/%{REMOTE_ADDR} -f
 RewriteRule . - [F]
 ## блок по подсети 1.2.3.* - вариант на файлах (активен)
 # RewriteCond %{REMOTE_ADDR} ^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})
-# RewriteCond %{DOCUMENT_ROOT}/madmen-includ/MetrikaSypexGeo/firewall/%1/%1\.%2\.%3 -f
+# RewriteCond %{DOCUMENT_ROOT}/hdden-includes/MetrikaSypexGeo/firewall/%1/%1\.%2\.%3 -f
 # RewriteRule . - [F]
 ## блок по подсети 1.2.3.* - вариант на папках (не активен)
 # RewriteCond %{REMOTE_ADDR} ^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})
-# RewriteCond %{DOCUMENT_ROOT}/madmen-includ/MetrikaSypexGeo/firewall/%1/%1\.%2/%1\.%2\.%3 -d
+# RewriteCond %{DOCUMENT_ROOT}/hdden-includes/MetrikaSypexGeo/firewall/%1/%1\.%2/%1\.%2\.%3 -d
 # RewriteRule . - [F]
 ## блок конкретных диапазонов вручную
 # RewriteCond %{REMOTE_ADDR} ^1\.2\.3\. [OR]
