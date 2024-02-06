@@ -1,12 +1,21 @@
 <?php
 // Обновление файла базы данных Sypex Geo
 // Настройки
+$allowed_secret = ''; // fwefsertg342433ffds - for example
+
 $url = 'https://sypexgeo.net/files/SxGeoCity_utf8.zip';  // Путь к скачиваемому файлу
 $dat_file_dir = './'; // Каталог в который сохранять dat-файл
 $last_updated_file = __DIR__ . '/SxGeo.upd'; // Файл в котором хранится дата последнего обновления
 define('INFO', false); // Вывод сообщений о работе, true заменить на false после установки в cron
 
 // Конец настроек
+
+// Проверка доступа. Если ключ назначен, но не передан - выходим
+if ($allowed_secret){
+	if (@$_GET['secret'] !== $allowed_secret){
+		exit();
+	}
+}
 
 set_time_limit(600);
 //error_reporting(E_ALL);
