@@ -26,7 +26,7 @@ $log_before_send = true; // Записывать отправляемые пар
 $optimize_log = true; // Записать заголовок лога один раз и больше не дописывать. Лучше всего работает, когда известен порядок ячеек и он неизменен; в этом случае можно вручную один раз прописать в логе заголовки и не трогать
 $log_static_header = 'date_time;ip;ip_subnet;ip_subnet_2;city;region;country;forwardedfor_ip;forwardedfor_ip_subnet;forwardedfor_ip_subnet_2;forwardedfor_ip_city;forwardedfor_ip_region;forwardedfor_ip_country;ip_isp;ip_org;blacklisted';
 $logfile = 'log.txt';
-$log_headers = true;
+$log_headers = false;
 
 /**
  * Рабочая зона
