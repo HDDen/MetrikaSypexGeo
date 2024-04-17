@@ -63,7 +63,10 @@ $response = array();
 $SxGeo = new SxGeo($sypex_path . 'SxGeoCity.dat');
 
 // IP
-$headers = getallheaders();
+$headers = [];
+if (function_exists('getallheaders')){
+    $headers = getallheaders();
+}
 $remote_ip = $_SERVER['REMOTE_ADDR'];
 $cf_connecting_ip = isset($headers['Cf-Connecting-Ip']) ? $headers['Cf-Connecting-Ip'] : '';
 $client_ip = isset($_SERVER['HTTP_CLIENT_IP']) ? $_SERVER['HTTP_CLIENT_IP'] : '';
